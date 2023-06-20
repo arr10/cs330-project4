@@ -1,10 +1,15 @@
 package com.example.pj4test.fragment
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.telephony.SmsManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import com.example.pj4test.ProjectConfiguration
 import com.example.pj4test.audioInference.SnapClassifier
@@ -46,15 +51,27 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
 
     override fun onPause() {
         super.onPause()
-        snapClassifier.stopInferencing()
+//        snapClassifier.stopInferencing()
+
     }
 
     override fun onResume() {
         super.onResume()
+//        snapClassifier.stopInferencing()
+
         snapClassifier.startInferencing()
     }
-
+    private fun call(){
+        val phoneIntent = Intent(Intent.ACTION_CALL)
+        phoneIntent.data = Uri.parse("tel:+821097550759")
+        startActivity(phoneIntent)
+    }
     override fun onResults(score: Float) {
+        if (score > SnapClassifier.THRESHOLD) {
+            val smsManager:SmsManager = requireActivity().getSystemService(SmsManager::class.java)
+            smsManager.sendTextMessage("+821097550759", null, "HI!", null, null)
+            call()
+        }
         activity?.runOnUiThread {
             if (score > SnapClassifier.THRESHOLD) {
                 snapView.text = "STOP"
@@ -64,6 +81,7 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
                 snapView.text = "NO STOP"
                 snapView.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.idleTextColor)
+
             }
         }
     }
