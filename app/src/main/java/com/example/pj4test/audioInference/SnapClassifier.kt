@@ -14,9 +14,11 @@ import kotlin.concurrent.scheduleAtFixedRate
 class SnapClassifier {
     // Libraries for audio classification
     lateinit var classifier: AudioClassifier
+    lateinit var scream_classifier: AudioClassifier
     lateinit var recorder: AudioRecord
+    lateinit var recorder2: AudioRecord
     lateinit var tensor: TensorAudio
-
+    lateinit var tensor2: TensorAudio
     // Listener that will be handle the result of this classifier
     private var detectorListener: DetectorListener? = null
 
@@ -33,9 +35,9 @@ class SnapClassifier {
      * @param   context Context of the application
      */
     fun initialize(context: Context) {
-//        classifier = AudioClassifier.createFromFile(context, YAMNET_MODEL)
         classifier = AudioClassifier.createFromFile(context, SPEECH_COMMAND_MODEL)
-
+        Log.d(TAG, "Model loaded from: $SPEECH_COMMAND_MODEL")
+        scream_classifier = AudioClassifier.createFromFile(context, YAMNET_MODEL)
         Log.d(TAG, "Model loaded from: $YAMNET_MODEL")
         audioInitialize()
         startRecording()
@@ -50,14 +52,19 @@ class SnapClassifier {
      */
     private fun audioInitialize() {
         tensor = classifier.createInputTensorAudio()
-
+        tensor2 = scream_classifier.createInputTensorAudio()
         val format = classifier.requiredTensorAudioFormat
+        val format2 = scream_classifier.requiredTensorAudioFormat
         val recorderSpecs = "Number Of Channels: ${format.channels}\n" +
                 "Sample Rate: ${format.sampleRate}"
-        Log.d(TAG, recorderSpecs)
-        Log.d(TAG, classifier.requiredInputBufferSize.toString())
-
+        val recorder2Specs = "Number Of Channels: ${format2.channels}\n" +
+                "Sample Rate: ${format2.sampleRate}"
+//        Log.d(TAG, recorderSpecs)
+//        Log.d(TAG, classifier.requiredInputBufferSize.toString())
+//        Log.d(TAG, recorder2Specs)
+        Log.d(TAG, scream_classifier.requiredInputBufferSize.toString())
         recorder = classifier.createAudioRecord()
+        recorder2 = scream_classifier.createAudioRecord()
     }
 
     /**
@@ -68,6 +75,8 @@ class SnapClassifier {
      */
     private fun startRecording() {
         recorder.startRecording()
+        recorder2.startRecording()
+
         Log.d(TAG, "record started!")
     }
 
@@ -79,6 +88,7 @@ class SnapClassifier {
      */
     private fun stopRecording() {
         recorder.stop()
+        recorder2.stop()
         Log.d(TAG, "record stopped.")
     }
 
@@ -99,19 +109,24 @@ class SnapClassifier {
         tensor.load(recorder)
         Log.d(TAG, tensor.tensorBuffer.shape.joinToString(","))
         val output = classifier.classify(tensor)
-        Log.d(TAG, output.toString())
 
         return output[0].categories.find { it.label == "stop" }!!.score
+    }
+    fun screamInference(): Float{
+        tensor2.load(recorder2)
+//        Log.d(TAG, tensor.tensorBuffer.shape.joinToString(","))
+        val output = scream_classifier.classify(tensor2)
+        return output[0].categories.find { it.label == "Speech" }!!.score
     }
 
     fun startInferencing() {
         if (task == null) {
             task = Timer().scheduleAtFixedRate(0, REFRESH_INTERVAL_MS) {
-                val score = inference()
-                detectorListener?.onResults(score)
-                if(detectorListener == null){
+                val score = screamInference()
+//                val score2 = 0.9f
+                val score2 = inference()
+                detectorListener?.onResults(score, score2)
 
-                }
             }
         }
     }
@@ -129,7 +144,8 @@ class SnapClassifier {
      * and set itself to this' detector listener
      */
     interface DetectorListener {
-        fun onResults(score: Float)
+        fun onResults(score: Float, score2:Float)
+//        fun onResults(score: Float)
     }
 
     /**
@@ -158,5 +174,6 @@ class SnapClassifier {
         const val YAMNET_MODEL = "yamnet_classification.tflite"
         const val SPEECH_COMMAND_MODEL = "speech_commands.tflite"
         const val THRESHOLD = 0.85f
+        const val THRESHOLD2 = 0.3f
     }
 }

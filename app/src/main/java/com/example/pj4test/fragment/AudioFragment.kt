@@ -75,8 +75,9 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
         startActivity(phoneIntent)
     }
     @SuppressLint("MissingPermission")
-    override fun onResults(score: Float) {
-        if (score > SnapClassifier.THRESHOLD) {
+    override fun onResults(score: Float, score2:Float){
+        Log.d(TAG, "shouting: $score, stop: $score2")
+        if (score > SnapClassifier.THRESHOLD && score2 > SnapClassifier.THRESHOLD){
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location : Location? ->
                     // Got last known location. In some rare situations this can be null.
@@ -84,12 +85,12 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
                     val lon = location?.longitude.toString()
                     val smsManager:SmsManager = requireActivity().getSystemService(SmsManager::class.java)
                     val msg =  "Current Location: \n Latitude: $lat \n Longitude: $lon"
-                    smsManager.sendTextMessage("+821097550759", null, msg, null, null)
+//                    smsManager.sendTextMessage("+821097550759", null, msg, null, null)
                 }
-            call()
+//            call()
         }
         activity?.runOnUiThread {
-            if (score > SnapClassifier.THRESHOLD) {
+            if (score > SnapClassifier.THRESHOLD && score2 > SnapClassifier.THRESHOLD2) {
                 snapView.text = "STOP"
                 snapView.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
                 snapView.setTextColor(ProjectConfiguration.activeTextColor)
