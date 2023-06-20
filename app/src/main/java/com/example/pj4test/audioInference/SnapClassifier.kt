@@ -33,7 +33,9 @@ class SnapClassifier {
      * @param   context Context of the application
      */
     fun initialize(context: Context) {
-        classifier = AudioClassifier.createFromFile(context, YAMNET_MODEL)
+//        classifier = AudioClassifier.createFromFile(context, YAMNET_MODEL)
+        classifier = AudioClassifier.createFromFile(context, SPEECH_COMMAND_MODEL)
+
         Log.d(TAG, "Model loaded from: $YAMNET_MODEL")
         audioInitialize()
         startRecording()
@@ -99,7 +101,7 @@ class SnapClassifier {
         val output = classifier.classify(tensor)
 //        Log.d(TAG, output.toString())
 
-        return output[0].categories.find { it.label == "Finger snapping" }!!.score
+        return output[0].categories.find { it.label == "stop" }!!.score
     }
 
     fun startInferencing() {
@@ -144,14 +146,14 @@ class SnapClassifier {
      * @property    TAG                 tag for logging
      * @property    REFRESH_INTERVAL_MS refresh interval of the inference
      * @property    YAMNET_MODEL        file path of the model file
+     * @property    SPEECH_COMMAND_MODEL        file path of the model file
      * @property    THRESHOLD           threshold of the score to classify sound as a horn sound
      */
     companion object {
-        const val TAG = "HornClassifier"
-
+        const val TAG = "SpeechClassifier"
         const val REFRESH_INTERVAL_MS = 33L
         const val YAMNET_MODEL = "yamnet_classification.tflite"
-
-        const val THRESHOLD = 0.3f
+        const val SPEECH_COMMAND_MODEL = "speech_commands.tflite"
+        const val THRESHOLD = 0.85f
     }
 }
