@@ -26,7 +26,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cameraFragmentContainerView"
+        app:layout_constraintBottom_toTopOf="@+id/speedometerFragmentContainerView"
         tools:layout="@layout/fragment_audio" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/speedometerFragmentContainerView"
+        android:name="com.example.pj4test.fragment.SpeedometerFragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/audioFragmentContainerView"
+        tools:layout="@layout/fragment_speedometer" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
