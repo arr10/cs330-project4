@@ -151,7 +151,7 @@ class SnapClassifier {
      */
     companion object {
         const val TAG = "SpeechClassifier"
-        const val REFRESH_INTERVAL_MS = 33L
+        const val REFRESH_INTERVAL_MS = 330L
         const val YAMNET_MODEL = "yamnet_classification.tflite"
         const val SPEECH_COMMAND_MODEL = "speech_commands.tflite"
         const val THRESHOLD = 0.85f

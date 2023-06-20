@@ -16,6 +16,7 @@
 
 package com.example.pj4test
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -25,9 +26,15 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.pj4test.workers.AudioWorker
 import java.util.LinkedList
 import kotlin.math.max
 import org.tensorflow.lite.task.vision.detector.Detection
+import java.util.concurrent.TimeUnit
 
 class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
@@ -37,11 +44,12 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     private var textPaint = Paint()
 
     private var scaleFactor: Float = 1f
-
+    private val workManager = context?.let { WorkManager.getInstance(it) }
     private var bounds = Rect()
-
+    private val periodicInferenceRequest = OneTimeWorkRequestBuilder<AudioWorker>().build()
     init {
         initPaints()
+//        workManager?.enqueue(periodicInferenceRequest)
     }
 
     fun clear() {

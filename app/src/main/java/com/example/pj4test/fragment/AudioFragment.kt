@@ -46,7 +46,7 @@ class AudioFragment: Fragment(), SnapClassifier.DetectorListener {
 
     override fun onPause() {
         super.onPause()
-        snapClassifier.stopInferencing()
+//        snapClassifier.stopInferencing()
     }
 
     override fun onResume() {
