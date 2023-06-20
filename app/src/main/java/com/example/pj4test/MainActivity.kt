@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
 
     // permissions
-    private val permissions = arrayOf(RECORD_AUDIO, CAMERA, CALL_PHONE, SEND_SMS, READ_PHONE_STATE)
+    private val permissions = arrayOf(RECORD_AUDIO, CAMERA, CALL_PHONE, SEND_SMS, READ_PHONE_STATE, ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)
     private val PERMISSIONS_REQUEST = 0x0000001;
 
     @RequiresApi(Build.VERSION_CODES.M)
