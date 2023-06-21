@@ -55,6 +55,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
     implementation "com.google.guava:guava:31.0.1-android"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
 
     // ADDED: tensorflow audio
     implementation 'org.tensorflow:tensorflow-lite-task-audio:0.4.0'

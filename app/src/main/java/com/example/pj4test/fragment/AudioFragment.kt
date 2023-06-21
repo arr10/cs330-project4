@@ -17,7 +17,11 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.example.pj4test.ProjectConfiguration
+import com.example.pj4test.StatsViewModel
 import com.example.pj4test.audioInference.StopClassifier
 import com.example.pj4test.databinding.FragmentAudioBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -37,6 +41,9 @@ class AudioFragment: Fragment(), StopClassifier.DetectorListener {
 
     // views
     lateinit var stopView: TextView
+    var current_speed: Float = 0.0f
+
+    private val viewModel: StatsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +69,11 @@ class AudioFragment: Fragment(), StopClassifier.DetectorListener {
         stopClassifier.initialize(requireContext())
         stopClassifier.setDetectorListener(this)
         stopClassifier.start()
+
+        viewModel.speed.observe(viewLifecycleOwner, Observer {speed ->
+            Log.d(TAG, "changing speed to $speed")
+            current_speed = speed
+        })
     }
 
     override fun onPause() {
@@ -78,8 +90,8 @@ class AudioFragment: Fragment(), StopClassifier.DetectorListener {
     }
     @SuppressLint("MissingPermission")
     override fun onResults(score: Float, score2:Float){
-        Log.d(TAG, "shouting: $score, stop: $score2")
-        if (score > StopClassifier.THRESHOLD && score2 > StopClassifier.THRESHOLD2){
+        Log.d(TAG, "shouting: $score, stop: $score2, current speed: $current_speed")
+        if (score > StopClassifier.THRESHOLD && score2 > StopClassifier.THRESHOLD2 && current_speed > SPEED_THRESHOLD){
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location : Location? ->
                     // Got last known location. In some rare situations this can be null.
@@ -105,5 +117,9 @@ class AudioFragment: Fragment(), StopClassifier.DetectorListener {
                 stopView.setTextColor(ProjectConfiguration.idleTextColor)
             }
         }
+    }
+
+    companion object {
+        const val SPEED_THRESHOLD = 6  // 6 km/h
     }
 }
