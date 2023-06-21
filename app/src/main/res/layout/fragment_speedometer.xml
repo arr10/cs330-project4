@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/SpeedometerView"
+        android:id="@+id/speedometerTextView"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"
@@ -14,6 +14,30 @@
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/listeningTextView" />
+
+    <TextView
+        android:id="@+id/listeningTextView"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:gravity="center"
+        android:text="NOT LISTENING"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/speedometerTextView" />
+
+    <TextView
+        android:id="@+id/stopTextView"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:gravity="center"
+        android:text="NO STOP"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listeningTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,7 +11,7 @@ import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 
 
-class SnapClassifier {
+class StopClassifier {
     // Libraries for audio classification
     lateinit var classifier: AudioClassifier
     lateinit var scream_classifier: AudioClassifier
@@ -40,9 +40,9 @@ class SnapClassifier {
         scream_classifier = AudioClassifier.createFromFile(context, YAMNET_MODEL)
         Log.d(TAG, "Model loaded from: $YAMNET_MODEL")
         audioInitialize()
-        startRecording()
+//        startRecording()
 
-        startInferencing()
+//        startInferencing()
     }
 
     /**
@@ -105,21 +105,21 @@ class SnapClassifier {
      *
      * @return  A score of the maximum float value among three classes
      */
-    fun inference(): Float {
+    private fun inference(): Float {
         tensor.load(recorder)
 //        Log.d(TAG, tensor.tensorBuffer.shape.joinToString(","))
         val output = classifier.classify(tensor)
 
         return output[0].categories.find { it.label == "stop" }!!.score
     }
-    fun screamInference(): Float{
+    private fun screamInference(): Float{
         tensor2.load(recorder2)
 //        Log.d(TAG, tensor.tensorBuffer.shape.joinToString(","))
         val output = scream_classifier.classify(tensor2)
         return output[0].categories.find { it.label == "Speech" }!!.score
     }
 
-    fun startInferencing() {
+    private fun startInferencing() {
         if (task == null) {
             task = Timer().scheduleAtFixedRate(0, REFRESH_INTERVAL_MS) {
                 val score = screamInference()
@@ -131,9 +131,19 @@ class SnapClassifier {
         }
     }
 
-    fun stopInferencing() {
+    private fun stopInferencing() {
         task?.cancel()
         task = null
+    }
+
+    fun start() {
+        startRecording()
+        startInferencing()
+    }
+
+    fun stop() {
+        stopRecording()
+        stopInferencing()
     }
 
     /**
