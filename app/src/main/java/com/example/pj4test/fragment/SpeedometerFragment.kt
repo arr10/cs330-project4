@@ -28,7 +28,7 @@ import java.util.TimerTask
 import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.concurrent.schedule
 
-class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.DetectorListener {
+class SpeedometerFragment : Fragment(), SensorEventListener {
     private val TAG = "SpeedometerFragment"
 
     private var _fragmentSpeedometerBinding: FragmentSpeedometerBinding? = null
@@ -41,8 +41,6 @@ class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.Dete
     private var savedInstanceState: Bundle? = null
 
     private lateinit var tvSpeed :TextView
-    private lateinit var tvListening :TextView
-    private lateinit var tvStop :TextView
 
 
 
@@ -56,34 +54,21 @@ class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.Dete
     private var task: TimerTask? = null
     private var startedListening = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        this.savedInstanceState = savedInstanceState
-        super.onCreate(savedInstanceState)
-
-        sensorManager = requireActivity().getSystemService(AppCompatActivity.SENSOR_SERVICE) as SensorManager
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sensorManager?.unregisterListener(this)
-        task?.cancel()
-        task = null
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _fragmentSpeedometerBinding = FragmentSpeedometerBinding.inflate(inflater, container, false)
 
+        sensorManager = requireActivity().getSystemService(AppCompatActivity.SENSOR_SERVICE) as SensorManager
         sensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-        stopClassifier = StopClassifier()
-        stopClassifier.initialize(requireContext())
-        stopClassifier.setDetectorListener(this)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         return fragmentSpeedometerBinding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopClassifier.stop()
     }
 
     private fun startSpeedTracking() {
@@ -99,24 +84,6 @@ class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.Dete
                     val speed = (steps.toFloat() * 0.8f * 3600000.0f / localPeriod) / 1000.0f
                     tvSpeed.text = "$speed km/h"
                     steps = 0
-
-                    if(speed > SPEED_THRESHOLD && !startedListening) {
-                        stopClassifier.start()
-                        startedListening = true
-
-                        tvListening.text = "LISTENING"
-                        tvListening.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
-                        tvListening.setTextColor(ProjectConfiguration.activeTextColor)
-
-                        Timer().schedule(60000) {
-                            stopClassifier.stop()
-                            startedListening = false
-
-                            tvListening.text = "NOT LISTENING"
-                            tvListening.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
-                            tvListening.setTextColor(ProjectConfiguration.idleTextColor)
-                        }
-                    }
                 }
             }
         } else {
@@ -129,8 +96,6 @@ class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.Dete
         super.onViewCreated(view, savedInstanceState)
 
         tvSpeed = fragmentSpeedometerBinding.speedometerTextView
-        tvListening = fragmentSpeedometerBinding.listeningTextView
-        tvStop = fragmentSpeedometerBinding.stopTextView
 
         startSpeedTracking()
     }
@@ -143,61 +108,16 @@ class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.Dete
     override fun onSensorChanged(event: SensorEvent) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_DETECTOR) {
             steps ++
-//            if(initial_steps == 0) {
-//                initial_steps = event.values[0].toInt();
-//            }
-//            steps += event.values[0].toInt() - initial_steps;
         }
     }
 
     override fun onPause() {
         super.onPause()
-//        Log.d(TAG, "unregistering sensor listener!");
-//        sensorManager?.unregisterListener(this)
-//        task?.cancel()
-//        task = null
-//        initial_steps = -1
+
     }
 
     override fun onResume() {
         super.onResume()
-//        Log.d(TAG, "registering sensor listener!");
-    }
-
-    private fun call(){
-        val phoneIntent = Intent(Intent.ACTION_CALL)
-        phoneIntent.data = Uri.parse("tel:+821096016349")
-        startActivity(phoneIntent)
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun onResults(score: Float, score2:Float){
-        Log.d(TAG, "shouting: $score, stop: $score2")
-        if (score > StopClassifier.THRESHOLD && score2 > StopClassifier.THRESHOLD2){
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location : Location? ->
-                    // Got last known location. In some rare situations this can be null.
-                    Log.d(TAG, "her ehrer ")
-                    val lat = location?.latitude.toString()
-                    val lon = location?.longitude.toString()
-                    val smsManager: SmsManager = requireActivity().getSystemService(SmsManager::class.java)
-                    val msg =  "Current Location: \n Latitude: $lat \n Longitude: $lon"
-                    Toast.makeText(requireContext(), "Sending message: $msg", Toast.LENGTH_LONG).show()
-//                    smsManager.sendTextMessage("+821097550759", null, msg, null, null)
-                }
-            call()
-        }
-        activity?.runOnUiThread {
-            if (score > StopClassifier.THRESHOLD && score2 > StopClassifier.THRESHOLD2) {
-                tvStop.text = "STOP"
-                tvStop.setBackgroundColor(ProjectConfiguration.activeBackgroundColor)
-                tvStop.setTextColor(ProjectConfiguration.activeTextColor)
-            } else {
-                tvStop.text = "NO STOP"
-                tvStop.setBackgroundColor(ProjectConfiguration.idleBackgroundColor)
-                tvStop.setTextColor(ProjectConfiguration.idleTextColor)
-            }
-        }
     }
 
     companion object {

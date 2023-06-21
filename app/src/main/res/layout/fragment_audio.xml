@@ -5,12 +5,12 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/speedometerTextView"
+        android:id="@+id/stopTextView"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"
         android:gravity="center"
-        android:text="0 km/h"
+        android:text="NO STOP"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
