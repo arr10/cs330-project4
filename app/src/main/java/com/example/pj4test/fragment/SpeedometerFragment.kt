@@ -18,7 +18,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.pj4test.ProjectConfiguration
+import com.example.pj4test.StatsViewModel
 import com.example.pj4test.audioInference.StopClassifier
 import com.example.pj4test.databinding.FragmentSpeedometerBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -54,6 +57,8 @@ class SpeedometerFragment : Fragment(), SensorEventListener {
     private var task: TimerTask? = null
     private var startedListening = false
 
+    private val viewModel: StatsViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -82,6 +87,7 @@ class SpeedometerFragment : Fragment(), SensorEventListener {
                     _lastTick = tick
                     // One step is about 0.8 meters
                     val speed = (steps.toFloat() * 0.8f * 3600000.0f / localPeriod) / 1000.0f
+                    viewModel.setSpeed(speed)
                     tvSpeed.text = "$speed km/h"
                     steps = 0
                 }
@@ -118,9 +124,5 @@ class SpeedometerFragment : Fragment(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-    }
-
-    companion object {
-        const val SPEED_THRESHOLD = 6  // 6 km/h
     }
 }
