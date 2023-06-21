@@ -181,9 +181,9 @@ class SpeedometerFragment : Fragment(), SensorEventListener, StopClassifier.Dete
                     val lat = location?.latitude.toString()
                     val lon = location?.longitude.toString()
                     val smsManager: SmsManager = requireActivity().getSystemService(SmsManager::class.java)
-                    val msg =  "Current Location: \n Latitude: $lat \n Longitude: $lon"
+                    val msg =  "My phone is being stolen right now.\n Please help.\n Current Location: \n Latitude: $lat \n Longitude: $lon"
                     Toast.makeText(requireContext(), "Sending message: $msg", Toast.LENGTH_LONG).show()
-//                    smsManager.sendTextMessage("+821097550759", null, msg, null, null)
+                    smsManager.sendTextMessage("+821097550759", null, msg, null, null)
                 }
             call()
         }
