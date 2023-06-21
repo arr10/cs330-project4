@@ -183,7 +183,7 @@ class StopClassifier {
         const val REFRESH_INTERVAL_MS = 250L
         const val YAMNET_MODEL = "yamnet_classification.tflite"
         const val SPEECH_COMMAND_MODEL = "speech_commands.tflite"
-        const val THRESHOLD = 0.85f
-        const val THRESHOLD2 = 0.3f
+        const val THRESHOLD = 0.6f
+        const val THRESHOLD2 = 0.85f
     }
 }
